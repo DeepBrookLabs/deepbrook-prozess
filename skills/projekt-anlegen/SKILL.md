@@ -12,17 +12,17 @@ Führt den Nutzer im aktuellen Ordner durchs Setup eines Projekts. Du führst da
 node <skill>/scripts/voraussetzungen.mjs
 ```
 
-Das Skript prüft Git, Node.js, die GitHub CLI `gh` und die Anmeldung bei GitHub (mit den Berechtigungen `repo` und `project`) und ändert nichts. Claude Code läuft schon, sonst wärst du nicht hier. Findet die Shell `node` gar nicht, erklär die Installation selbst (Windows `winget install --id OpenJS.NodeJS.LTS -e`, macOS `brew install node`, sonst https://nodejs.org/).
+Das Skript prüft Git, Node.js, die GitHub CLI `gh` und die Anmeldung bei GitHub (mit den Berechtigungen `repo` und `project`) und ändert nichts. Claude Code läuft schon, sonst wärst du nicht hier. Findet die Shell `node` gar nicht, erklär die Installation selbst (Windows: PowerShell als Administrator öffnen, dann `winget install --id OpenJS.NodeJS.LTS -e`; macOS `brew install node`; sonst https://nodejs.org/).
 
 Ist etwas offen, halte an und erklär jeden Punkt Schritt für Schritt mit dem Hinweis aus der Ausgabe:
-- **Installation:** Frag, ob du den Befehl ausführen sollst; nur bei Ja ausführen. Danach muss der Nutzer meist das Terminal und Claude Code neu starten.
+- **Installation:** Frag, ob du den Befehl ausführen sollst; nur bei Ja ausführen. Danach müssen Terminal und Claude Code meist neu starten, und du vergisst dabei das Gespräch. Sag dem Nutzer deshalb vor dem Neustart ausdrücklich: „Schließ das Terminal, öffne ein neues im selben Ordner, starte Claude Code und gib wieder `/projekt-anlegen` ein. Das Setup prüft dann erneut und macht dort weiter, wo noch etwas fehlt.“
 - **Selbst eingeben** (Anmeldung): Der Nutzer gibt den Befehl mit Präfix `!` ein, z. B. `! gh auth login`; fehlt ihm ein GitHub-Konto, erklär zuerst die Registrierung.
 
 Starte das Skript danach erneut und mach erst weiter, wenn alles ✓ ist.
 
 ## 2. Fragen
 
-Frag nacheinander, jeweils mit einem Vorschlag:
+Stell **genau eine Frage pro Nachricht**, jeweils mit einem Vorschlag, und warte auf die Antwort, bevor du die nächste stellst. Mehrere Fragen auf einmal verwirren Anfänger: Sie beantworten nur die letzte. Das gilt für alle Rückfragen im Setup, auch für die Unterfragen unten und die Fragen zu vorhandenen Dateien.
 
 1. **Name** des Projekts. Schlag daraus den Repo-Namen vor (Kleinbuchstaben, Bindestriche).
 2. **Konto:** unter dem eigenen GitHub-Konto (`gh api user --jq .login`) oder einer Organisation (`gh api user/orgs --jq '.[].login'`).

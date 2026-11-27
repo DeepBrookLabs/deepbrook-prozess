@@ -38,7 +38,13 @@ Konzeptbilder, Notizen oder PDFs legst du jederzeit in den Ordner `inbox/`. Clau
 - **Claude Code** ([Installation](https://docs.claude.com/en/docs/claude-code/setup))
 - **Git**, **Node.js** und die **GitHub CLI `gh`**, bei GitHub angemeldet mit den Berechtigungen `repo` und `project`
 
-Fehlt etwas davon, ist das kein Problem: Das Setup prüft alles, erklärt jeden fehlenden Schritt und installiert auf deine Erlaubnis hin selbst. Nur Node.js brauchst du schon für die Installation unten (Windows: `winget install --id OpenJS.NodeJS.LTS -e`, macOS: `brew install node`, sonst [nodejs.org](https://nodejs.org/)).
+Fehlt etwas davon, ist das kein Problem: Das Setup prüft alles, erklärt jeden fehlenden Schritt und installiert auf deine Erlaubnis hin selbst. Nur Node.js brauchst du schon für die Installation unten:
+
+- **Windows:** Öffne die PowerShell **als Administrator** (Rechtsklick auf Start → „Terminal (Administrator)“) und gib ein: `winget install --id OpenJS.NodeJS.LTS -e`
+- **macOS:** `brew install node`
+- **sonst:** [nodejs.org](https://nodejs.org/)
+
+**Schließ danach das Terminal und öffne ein neues.** Erst das neue Terminal kennt `node` und `npx`; im alten kommt sonst die Meldung, der Befehl sei nicht gefunden.
 
 ## Loslegen
 
