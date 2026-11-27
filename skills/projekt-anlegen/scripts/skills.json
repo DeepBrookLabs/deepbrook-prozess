@@ -1,0 +1,26 @@
+{
+  "sources": [
+    {
+      "source": "mattpocock/skills",
+      "ref": "abeeaf95660ba9e8b7c753eb38f441ca707a8823",
+      "skills": [
+        "grilling",
+        "domain-modeling",
+        "tdd",
+        "pr",
+        "code-review",
+        "diagnosing-bugs",
+        "codebase-design",
+        "prototype",
+        "research",
+        "triage",
+        "writing-for-agents",
+        "wizard"
+      ]
+    },
+    {
+      "source": "DeepBrookLabs/deepbrook-prozess",
+      "skills": ["prozess", "spec", "spec-idee", "to-tickets"]
+    }
+  ]
+}

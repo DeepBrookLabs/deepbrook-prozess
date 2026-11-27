@@ -1,0 +1,8 @@
+# Ablage des Nutzers, siehe Skill prozess
+inbox/
+
+# Secrets und lokale Einstellungen
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
