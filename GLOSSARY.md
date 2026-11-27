@@ -3,7 +3,7 @@
 Begriffe des Entwicklungsprozesses, den dieses Paket liefert. Die Begriffe eines Projekts selbst (Spielwelt, Fachsprache) stehen im Glossar des Projekts.
 
 **Projektart**
-Die Art dessen, was ein Projekt entwickelt (zum Start nur *Spiel*; sonst *Anderes*). Eine Projektart ist eine Datei unter `vorlagen/projektarten/` und bündelt Bereiche, Assets-Spalte und Nutzerbegriff.
+Die Art dessen, was ein Projekt entwickelt (zum Start nur *Spiel*; sonst *Anderes*). Eine Projektart ist eine Datei unter `skills/projekt-anlegen/vorlagen/projektarten/` und bündelt Bereiche, Assets-Spalte und Nutzerbegriff.
 _Vermeiden:_ Projekttyp, Template
 
 **Bereich**
