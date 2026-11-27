@@ -15,10 +15,10 @@
 //
 // Gibt es im Zielkonto schon ein Board mit dem Titel, bricht das Skript ab.
 
-import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { gh, graphql, updateOptions } from './gh.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -134,20 +134,6 @@ export function replaceProjektwerte(content, section) {
   return `${before}${before ? '\n' : ''}${section}${after ? `\n${after}` : ''}`;
 }
 
-function gh(args, input) {
-  return execFileSync('gh', args, {
-    encoding: 'utf8',
-    input,
-    stdio: [input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
-  });
-}
-
-function graphql(query, variables = {}) {
-  const out = JSON.parse(gh(['api', 'graphql', '--input', '-'], JSON.stringify({ query, variables })));
-  if (out.errors) throw new Error(out.errors.map((e) => e.message).join('; '));
-  return out.data;
-}
-
 const FIELDS_QUERY = `query($id: ID!) {
   node(id: $id) {
     ... on ProjectV2 {
@@ -159,10 +145,6 @@ const FIELDS_QUERY = `query($id: ID!) {
   }
 }`;
 
-const UPDATE_FIELD = `mutation($input: UpdateProjectV2FieldInput!) {
-  updateProjectV2Field(input: $input) { clientMutationId }
-}`;
-
 function readBoard(projectId) {
   const node = graphql(FIELDS_QUERY, { id: projectId }).node;
   const field = (name) => {
@@ -171,10 +153,6 @@ function readBoard(projectId) {
     return f;
   };
   return { status: field('Status'), bereich: field('Bereich'), workflows: node.workflows.nodes };
-}
-
-function updateOptions(fieldId, options) {
-  graphql(UPDATE_FIELD, { input: { fieldId, singleSelectOptions: options } });
 }
 
 function parseArgs(argv) {
