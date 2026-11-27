@@ -126,3 +126,35 @@ test('Lauf schreibt die Dateien mit Werten und lässt vorhandene stehen', () => 
   assert.equal(readFileSync(path.join(dir, '.github/ISSUE_TEMPLATE/spec.md'), 'utf8'), 'Repo o/r');
   assert.ok(existsSync(path.join(dir, 'inbox')));
 });
+
+test('Dateiplan: vorhandene Dateien nur mit Zustimmung überschreiben oder ergänzen', () => {
+  const existing = { 'CLAUDE.md': '# alt', 'README.md': '# Readme', 'GLOSSARY.md': '# G' };
+  const plan = planFiles(['CLAUDE.md', 'GLOSSARY.md', 'README.md'], (p) => existing[p],
+    { ueberschreiben: ['README.md'], ergaenzen: ['CLAUDE.md'] });
+  assert.deepEqual(plan.map((f) => [f.dest, f.action]), [
+    ['CLAUDE.md', 'ergänzen'],
+    ['GLOSSARY.md', 'vorhanden'],
+    ['README.md', 'überschreiben'],
+  ]);
+});
+
+test('Dateiplan: Zustimmung nur für vorhandene Vorlagen-Dateien', () => {
+  const read = (p) => (p === 'CLAUDE.md' ? '# alt' : undefined);
+  assert.throws(() => planFiles(['CLAUDE.md', 'README.md'], read, { ueberschreiben: ['README.md'] }), /README\.md.*nicht vorhanden/);
+  assert.throws(() => planFiles(['CLAUDE.md'], read, { ergaenzen: ['foo.md'] }), /foo\.md.*keine Vorlage/);
+  assert.throws(() => planFiles(['CLAUDE.md'], read, { ergaenzen: ['CLAUDE.md'], ueberschreiben: ['CLAUDE.md'] }), /CLAUDE\.md.*beides/);
+});
+
+test('Lauf überschreibt und ergänzt nur die freigegebenen Dateien', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'vorlagen-'));
+  writeFileSync(path.join(dir, 'CLAUDE.md'), '# alt\n');
+  writeFileSync(path.join(dir, 'README.md'), '# Readme alt');
+  writeFileSync(path.join(dir, 'GLOSSARY.md'), '# G alt');
+  const read = (p) => (existsSync(path.join(dir, p)) ? readFileSync(path.join(dir, p), 'utf8') : undefined);
+  const plan = planFiles(['CLAUDE.md', 'GLOSSARY.md', 'README.md'], read, { ueberschreiben: ['README.md'], ergaenzen: ['CLAUDE.md'] });
+  const sources = { 'CLAUDE.md': '# Prozess {{name}}\n', 'README.md': '# {{name}}', 'GLOSSARY.md': '# neu' };
+  applyPlan(plan, { dir, read: (src) => sources[src], values: { name: 'X' } });
+  assert.equal(read('CLAUDE.md'), '# alt\n\n# Prozess X\n');
+  assert.equal(read('README.md'), '# X');
+  assert.equal(read('GLOSSARY.md'), '# G alt');
+});

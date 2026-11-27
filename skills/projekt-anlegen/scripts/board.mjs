@@ -13,7 +13,10 @@
 // --dir       Projektordner, in dessen docs/agents/issue-tracker.md die IDs kommen; Standard: aktueller Ordner
 // --dry-run   gibt nur aus, was passieren würde, und ändert nichts
 //
-// Gibt es im Zielkonto schon ein Board mit dem Titel, bricht das Skript ab.
+// --neues-board  legt ein Board an, obwohl mit dem Repo schon eines verknüpft ist; nur nach Rückfrage
+//
+// Gibt es im Zielkonto schon ein Board mit dem Titel, bricht das Skript ab; ebenso, wenn mit dem Repo
+// schon ein Board verknüpft ist und --neues-board fehlt.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -145,6 +148,27 @@ const FIELDS_QUERY = `query($id: ID!) {
   }
 }`;
 
+// Vorhandene Boards: gleicher Titel im Konto stoppt immer; ein schon mit dem Repo verknüpftes Board
+// stoppt, bis der Nutzer zugestimmt hat, trotzdem ein neues anzulegen (--neues-board).
+export function checkExisting({ owner, title, sameTitle, linked, neu }) {
+  if (sameTitle) return `Im Konto ${owner} gibt es schon ein Board „${title}“: ${sameTitle.url}. Anderen Titel mit --title wählen oder das vorhandene Board verwenden.`;
+  if (linked.length && !neu) {
+    const list = linked.map((b) => `${b.title} (${b.url})`).join(', ');
+    return `Mit dem Repo ist schon ein Board verknüpft: ${list}. Frag den Nutzer, ob trotzdem ein neues angelegt werden soll; nur dann mit --neues-board starten.`;
+  }
+  return null;
+}
+
+function linkedBoards(repo) {
+  const [owner, name] = repo.split('/');
+  try {
+    const data = graphql(`query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { projectsV2(first: 50) { nodes { title url closed } } } }`, { owner, name });
+    return data.repository.projectsV2.nodes.filter((b) => !b.closed);
+  } catch {
+    return []; // Repo gibt es noch nicht
+  }
+}
+
 function readBoard(projectId) {
   const node = graphql(FIELDS_QUERY, { id: projectId }).node;
   const field = (name) => {
@@ -156,18 +180,19 @@ function readBoard(projectId) {
 }
 
 function parseArgs(argv) {
-  const opts = { dryRun: false, repo: null, assets: null, bereiche: [], title: null, dir: process.cwd() };
+  const opts = { dryRun: false, neu: false, repo: null, assets: null, bereiche: [], title: null, dir: process.cwd() };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--dry-run') opts.dryRun = true;
     else if (a === '--repo') opts.repo = argv[++i];
     else if (a === '--assets') opts.assets = argv[++i];
     else if (a === '--bereich') opts.bereiche.push(parseBereich(argv[++i] ?? ''));
+    else if (a === '--neues-board') opts.neu = true;
     else if (a === '--title') opts.title = argv[++i];
     else if (a === '--dir') opts.dir = argv[++i];
     else throw new Error(`Unbekannte Option: ${a}`);
   }
-  const usage = 'Aufruf: node board.mjs --repo <owner>/<repo> --assets ja|nein --bereich <Name:FARBE:Wofür> [--bereich …] [--title <Titel>] [--dir <Projektordner>] [--dry-run]';
+  const usage = 'Aufruf: node board.mjs --repo <owner>/<repo> --assets ja|nein --bereich <Name:FARBE:Wofür> [--bereich …] [--title <Titel>] [--neues-board] [--dir <Projektordner>] [--dry-run]';
   if (!opts.repo || !/^[^/\s]+\/[^/\s]+$/.test(opts.repo)) throw new Error(usage);
   if (!['ja', 'nein'].includes(opts.assets)) throw new Error(`--assets muss ja oder nein sein.\n${usage}`);
   opts.assets = opts.assets === 'ja';
@@ -192,9 +217,13 @@ function main() {
   for (const line of formatPlan(plan, { dryRun })) console.log(`- ${line}`);
 
   const existing = JSON.parse(gh(['project', 'list', '--owner', plan.owner, '--format', 'json', '-L', '500']));
-  const clash = existing.projects.find((p) => p.title === title);
-  if (clash) {
-    console.error(`Im Konto ${plan.owner} gibt es schon ein Board „${title}“: ${clash.url}. Anderen Titel mit --title wählen oder das vorhandene Board verwenden.`);
+  const stop = checkExisting({
+    owner: plan.owner, title, neu: opts.neu,
+    sameTitle: existing.projects.find((p) => p.title === title),
+    linked: linkedBoards(repo),
+  });
+  if (stop) {
+    console.error(stop);
     process.exit(1);
   }
   if (dryRun) return;

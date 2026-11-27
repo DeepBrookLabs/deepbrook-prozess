@@ -8,7 +8,17 @@ Führt den Nutzer im aktuellen Ordner durchs Setup eines Projekts. Du führst da
 
 ## 1. Voraussetzungen
 
-Prüf `git --version`, `node --version` und `gh auth status`. Fehlt etwas oder ist `gh` nicht angemeldet, halte an und erklär Schritt für Schritt, was zu tun ist; installiere nur, wenn der Nutzer zustimmt. Ein Anmeldebefehl, den der Nutzer selbst eingeben muss, bekommt das Präfix `!` (z. B. `! gh auth login`).
+```
+node <skill>/scripts/voraussetzungen.mjs
+```
+
+Das Skript prüft Git, Node.js, die GitHub CLI `gh` und die Anmeldung bei GitHub (mit den Berechtigungen `repo` und `project`) und ändert nichts. Claude Code läuft schon, sonst wärst du nicht hier. Findet die Shell `node` gar nicht, erklär die Installation selbst (Windows `winget install --id OpenJS.NodeJS.LTS -e`, macOS `brew install node`, sonst https://nodejs.org/).
+
+Ist etwas offen, halte an und erklär jeden Punkt Schritt für Schritt mit dem Hinweis aus der Ausgabe:
+- **Installation:** Frag, ob du den Befehl ausführen sollst; nur bei Ja ausführen. Danach muss der Nutzer meist das Terminal und Claude Code neu starten.
+- **Selbst eingeben** (Anmeldung): Der Nutzer gibt den Befehl mit Präfix `!` ein, z. B. `! gh auth login`; fehlt ihm ein GitHub-Konto, erklär zuerst die Registrierung.
+
+Starte das Skript danach erneut und mach erst weiter, wenn alles ✓ ist.
 
 ## 2. Fragen
 
@@ -19,13 +29,20 @@ Frag nacheinander, jeweils mit einem Vorschlag:
 3. **Vision** in ein bis drei Sätzen: Was entsteht, für wen, was macht es besonders?
 4. **Projektart:** „Was entwickelst du? Spiel / Anderes“. Die Projektarten liegen unter `vorlagen/projektarten/`.
    - **Spiel:** Stell die Fragen aus der Spalte „Nur wenn“ der Bereiche-Tabelle (z. B. „Hat dein Spiel einen Online-Teil?“). Jeder Bereich mit Ja geht als `--ja <Bereich>` an das Vorlagen-Skript.
-   - **Anderes:** Frag das Wort für die Menschen, die das Ergebnis benutzen (Standard „Nutzer“), ob es eine Spalte Assets für Bilder und Grafiken geben soll, und welche Bereiche das Board außer Spec und Entscheidung bekommt (je Bereich ein Name und wofür). Die Farben verteilt das Skript.
+   - **Anderes:** Frag nacheinander
+     - das Wort für die Menschen, die das Ergebnis benutzen (Standard „Nutzer“, z. B. „Kunde“ oder „Leser“),
+     - ob es eine Spalte Assets für Bilder und Grafiken geben soll (ja/nein),
+     - welche Bereiche das Board außer Spec und Entscheidung bekommt: je Bereich ein Name und wofür er steht (z. B. „Oberfläche – Seiten und Bedienung“). Schlag zwei bis vier passend zur Vision vor.
+
+     Die Farben verteilt das Skript der Reihe nach; der Nutzer muss keine wählen.
 
 Fass die Antworten zusammen und hol dir ein Ja, bevor du etwas anlegst.
 
 ## 3. Repo
 
-Ist der Ordner noch kein Git-Repo: `git init -b main`. Dann `gh repo create <owner>/<repo> --private --source . --remote origin`. Gibt es das Repo schon, frag, ob es verwendet werden soll.
+Ist der Ordner noch kein Git-Repo: `git init -b main`. Dann `gh repo create <owner>/<repo> --private --source . --remote origin`.
+
+**Bestehendes Repo:** Hat der Ordner schon einen Remote (`git remote get-url origin`) oder gibt es das Repo auf GitHub schon, frag, ob es verwendet werden soll, und nimm dann dessen `<owner>/<repo>`. In einem bestehenden Repo ändern die folgenden Schritte nichts Vorhandenes ohne Rückfrage; die Trockenläufe zeigen, was schon da ist.
 
 ## 4. Vorlagen
 
@@ -33,7 +50,14 @@ Ist der Ordner noch kein Git-Repo: `git init -b main`. Dann `gh repo create <own
 node <skill>/scripts/vorlagen.mjs --repo <owner>/<repo> --name "<Name>" --vision "<Vision>" --projektart spiel [--ja Server] --dry-run
 ```
 
-Bei Anderes statt `--ja`: `--projektart anderes --nutzerbegriff <Wort> --assets ja|nein --bereich "<Name>::<Wofür>"` je Bereich. Das Skript legt Ordner und Dateien an (CLAUDE.md, README.md, GLOSSARY.md, `.gitignore` mit `inbox/`, `docs/`, Spec-Issue-Vorlage) und schreibt `docs/agents/prozess.md`. Vorhandene Dateien lässt es stehen. Die letzte Zeile nennt die Argumente für das Board-Skript.
+Bei Anderes statt `--ja`: `--projektart anderes --nutzerbegriff <Wort> --assets ja|nein --bereich "<Name>::<Wofür>"` je Bereich. Das Skript legt Ordner und Dateien an (CLAUDE.md, README.md, GLOSSARY.md, `.gitignore` mit `inbox/`, `docs/`, Spec-Issue-Vorlage) und schreibt `docs/agents/prozess.md`. Die letzte Zeile nennt die Argumente für das Board-Skript.
+
+Vorhandene Dateien lässt das Skript stehen und nennt sie im Trockenlauf als „vorhanden“ (in eine vorhandene `.gitignore` kommt nur `inbox/` dazu). Frag für jede vorhandene Datei, was passieren soll, und erklär kurz, wofür die Vorlage da ist:
+- **lassen** (Standard): nichts weiter.
+- **ergänzen:** Die Vorlage kommt unten an die Datei; sinnvoll für `CLAUDE.md`, damit der Verweis auf den Prozess dazukommt. Argument `--ergaenzen <Datei>`.
+- **ersetzen:** Die Vorlage ersetzt die Datei. Argument `--ueberschreiben <Datei>`.
+
+Ohne Ja zu ergänzen oder ersetzen bleibt die Datei unverändert. Zeig den Trockenlauf mit den gewählten Argumenten noch einmal, bevor du startest.
 
 ## 5. Labels
 
@@ -41,7 +65,7 @@ Bei Anderes statt `--ja`: `--projektart anderes --nutzerbegriff <Wort> --assets 
 node <skill>/scripts/labels.mjs --repo <owner>/<repo> --dry-run
 ```
 
-Listet der Trockenlauf GitHub-Standard-Labels, frag, ob sie entfernt werden sollen; nur bei Ja kommt `--remove-defaults` dazu.
+Listet der Trockenlauf GitHub-Standard-Labels, frag, ob sie entfernt werden sollen; nur bei Ja kommt `--remove-defaults` dazu. Will der Trockenlauf vorhandene Labels mit gleichem Namen ändern (Farbe, Beschreibung), frag vorher; ohne Ja überspring den Lauf und sag dem Nutzer, welche Labels vom Prozess abweichen. Eigene Labels des Projekts bleiben immer unberührt.
 
 ## 6. Board
 
@@ -50,6 +74,8 @@ Die Argumente aus der letzten Zeile des Vorlagen-Skripts:
 ```
 node <skill>/scripts/board.mjs --repo <owner>/<repo> --assets ja --bereich "…" … --dry-run
 ```
+
+Ist mit dem Repo schon ein Board verknüpft, hält das Skript an und nennt es. Frag, ob trotzdem ein neues Board entstehen soll; nur bei Ja mit `--neues-board` starten. Sonst überspring den Schritt, und die IDs in `docs/agents/issue-tracker.md` trägst du mit dem Nutzer von Hand ein (`gh project field-list <nr> --owner <owner> --format json`).
 
 Das Skript kopiert das Vorlage-Board, verknüpft es mit dem Repo, setzt Spalten und Bereiche und schreibt die IDs in `docs/agents/issue-tracker.md`. Meldet es eine ausgeschaltete Automatik, gib dem Nutzer den Link und bitte ihn, sie einzuschalten.
 

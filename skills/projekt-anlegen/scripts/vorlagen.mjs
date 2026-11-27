@@ -2,17 +2,20 @@
 // Kopiert die Projektvorlagen in einen Projektordner und schreibt docs/agents/prozess.md.
 //
 //   node vorlagen.mjs --repo <owner>/<repo> --name <Name> --vision <Text> --projektart spiel [--ja <Bereich> …]
-//                     [--dir <Projektordner>] [--dry-run]
+//                     [--ueberschreiben <Datei> …] [--ergaenzen <Datei> …] [--dir <Projektordner>] [--dry-run]
 //   node vorlagen.mjs … --projektart anderes --nutzerbegriff <Wort> --assets ja|nein --bereich <Bereich> […]
 //
 // --projektart    Datei unter vorlagen/projektarten/ (ohne .md) oder „anderes“
 // --ja            Bereich der Projektart, dessen Frage („Nur wenn“) der Nutzer mit Ja beantwortet hat
 // --nutzerbegriff, --assets, --bereich  nur bei „anderes“; --bereich wie bei board.mjs ("Name:FARBE:Wofür")
+// --ueberschreiben  vorhandene Datei (Pfad im Projekt, z. B. README.md) durch die Vorlage ersetzen;
+//                  nur nach Zustimmung des Nutzers
+// --ergaenzen     Vorlage unten an eine vorhandene Datei anhängen (z. B. CLAUDE.md); nur nach Zustimmung
 // --dir           Projektordner, Standard: aktueller Ordner
 // --dry-run       gibt nur aus, was passieren würde, und ändert nichts
 //
-// Vorhandene Dateien bleiben unverändert und werden als „vorhanden“ gemeldet; nur in eine vorhandene
-// .gitignore wird inbox/ ergänzt. Am Ende stehen die Argumente für board.mjs.
+// Vorhandene Dateien bleiben unverändert und werden als „vorhanden“ gemeldet, außer sie stehen bei
+// --ueberschreiben oder --ergaenzen; nur in eine vorhandene .gitignore wird inbox/ immer ergänzt. Am Ende stehen die Argumente für board.mjs.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -91,14 +94,26 @@ export function mergeGitignore(text) {
 }
 
 // readExisting(dest) liefert den Inhalt einer vorhandenen Datei oder undefined.
-export function planFiles(files, readExisting) {
-  return files.map((src) => {
+// ueberschreiben/ergaenzen: Zielpfade vorhandener Dateien, für die der Nutzer zugestimmt hat.
+export function planFiles(files, readExisting, { ueberschreiben = [], ergaenzen = [] } = {}) {
+  const norm = (p) => p.replace(/\\/g, '/').replace(/^\.\//, '');
+  const over = new Set(ueberschreiben.map(norm));
+  const add = new Set(ergaenzen.map(norm));
+  const plan = files.map((src) => {
     const dest = targetPath(src);
+    const key = dest.split(path.sep).join('/');
     const existing = readExisting(dest);
+    if (over.has(key) && add.has(key)) throw new Error(`${key}: entweder überschreiben oder ergänzen, nicht beides`);
+    if ((over.has(key) || add.has(key)) && existing === undefined) throw new Error(`${key} ist nicht vorhanden, die Datei wird ohnehin angelegt`);
     let action = existing === undefined ? 'anlegen' : 'vorhanden';
-    if (src === 'gitignore' && existing !== undefined && !hasInbox(existing)) action = 'ergänzen';
+    if (over.has(key)) action = 'überschreiben';
+    else if (add.has(key)) action = 'ergänzen';
+    else if (src === 'gitignore' && existing !== undefined && !hasInbox(existing)) action = 'ergänzen';
     return { src, dest, action };
   });
+  const known = new Set(plan.map((f) => f.dest.split(path.sep).join('/')));
+  for (const p of [...over, ...add]) if (!known.has(p)) throw new Error(`${p}: dafür gibt es keine Vorlage`);
+  return plan;
 }
 
 export function bereicheTable(bereiche) {
@@ -117,14 +132,18 @@ export function applyPlan(plan, { dir, read, values }) {
     const dest = path.join(dir, f.dest);
     if (f.action === 'vorhanden') continue;
     mkdirSync(path.dirname(dest), { recursive: true });
-    const text = f.action === 'ergänzen' ? mergeGitignore(readFileSync(dest, 'utf8')) : render(read(f.src), values);
+    let text = render(read(f.src), values);
+    if (f.action === 'ergänzen') {
+      const before = readFileSync(dest, 'utf8');
+      text = f.src === 'gitignore' ? mergeGitignore(before) : `${before.replace(/\s*$/, '')}\n\n${text}`;
+    }
     writeFileSync(dest, text);
   }
   mkdirSync(path.join(dir, 'inbox'), { recursive: true });
 }
 
 function parseArgs(argv) {
-  const opts = { dir: process.cwd(), dryRun: false, ja: [], bereiche: [] };
+  const opts = { dir: process.cwd(), dryRun: false, ja: [], bereiche: [], ueberschreiben: [], ergaenzen: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => {
@@ -141,6 +160,8 @@ function parseArgs(argv) {
     else if (a === '--nutzerbegriff') opts.nutzerbegriff = next();
     else if (a === '--assets') opts.assets = next();
     else if (a === '--bereich') opts.bereiche.push(parseBereich(next()));
+    else if (a === '--ueberschreiben') opts.ueberschreiben.push(next());
+    else if (a === '--ergaenzen') opts.ergaenzen.push(next());
     else if (a === '--dir') opts.dir = path.resolve(next());
     else throw new Error(`Unbekanntes Argument ${a}`);
   }
@@ -188,13 +209,21 @@ function main() {
     const p = path.join(opts.dir, dest);
     return existsSync(p) ? readFileSync(p, 'utf8') : undefined;
   };
-  const plan = planFiles(listVorlagen(), readExisting);
+  const plan = planFiles(listVorlagen(), readExisting, opts);
 
   console.log(`${opts.dryRun ? 'Trockenlauf' : 'Lauf'} in ${opts.dir}`);
   console.log(`- Projektart ${opts.label}, Nutzerbegriff ${opts.nutzerbegriff}, Assets-Spalte ${opts.assets}`);
   console.log(`- Bereiche: ${['Spec', 'Entscheidung', ...opts.bereiche.map((b) => b.name)].join(', ')}`);
-  const verb = { anlegen: opts.dryRun ? 'würde anlegen' : 'angelegt', ergänzen: opts.dryRun ? 'würde inbox/ ergänzen' : 'inbox/ ergänzt', vorhanden: 'vorhanden, unverändert' };
-  for (const f of plan) console.log(`- ${f.dest.split(path.sep).join('/')}: ${verb[f.action]}`);
+  const dry = opts.dryRun;
+  const verb = (f) => ({
+    anlegen: dry ? 'würde anlegen' : 'angelegt',
+    ergänzen: f.src === 'gitignore' ? (dry ? 'würde inbox/ ergänzen' : 'inbox/ ergänzt') : (dry ? 'würde Vorlage unten anhängen' : 'Vorlage unten angehängt'),
+    überschreiben: dry ? 'würde durch die Vorlage ersetzen' : 'durch die Vorlage ersetzt',
+    vorhanden: 'vorhanden, unverändert',
+  })[f.action];
+  for (const f of plan) console.log(`- ${f.dest.split(path.sep).join('/')}: ${verb(f)}`);
+  const kept = plan.filter((f) => f.action === 'vorhanden').map((f) => f.dest.split(path.sep).join('/'));
+  if (kept.length) console.log(`Vorhanden: ${kept.join(', ')}. Ändern nur nach Rückfrage mit --ueberschreiben oder --ergaenzen <Datei>.`);
   if (!opts.dryRun) applyPlan(plan, { dir: opts.dir, read: (src) => readFileSync(path.join(PROJEKT, src), 'utf8'), values });
 
   console.log('');
