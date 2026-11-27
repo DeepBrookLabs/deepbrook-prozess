@@ -66,15 +66,13 @@ Danach startest du Claude Code neu, damit es die Skills lädt, und hältst die e
 
 ## Skills aktuell halten
 
-Die Skills liegen im Projekt unter `.agents/skills/`; `.claude/skills/` verweist nur darauf (unter Windows als Verknüpfung, eine sogenannte Junction). **`.agents/` gehört mit ins Repo und darf nicht gelöscht werden**, sonst fehlen die Skills. Welcher Stand installiert ist, steht in `skills-lock.json`.
-
-Neue Versionen der Prozess-Skills holst du im Projektordner mit:
+Das Setup legt die Skills im Projekt unter `.claude/skills/` ab; welcher Stand installiert ist, steht in `skills-lock.json`. Neue Versionen der Prozess-Skills holst du im Projektordner mit:
 
 ```sh
 npx skills update
 ```
 
-Prüf danach mit `git status`, was sich geändert hat, und committe es.
+Prüf danach mit `git status`, was sich geändert hat, und committe es. Ein Update kann die Skills nach `.agents/skills/` verschieben; `.claude/skills/` verweist dann nur noch darauf (unter Windows als Verknüpfung, eine sogenannte Junction). **`.agents/` gehört dann mit ins Repo und darf nicht gelöscht werden**, sonst fehlen die Skills.
 
 ## Was im Paket steckt
 
