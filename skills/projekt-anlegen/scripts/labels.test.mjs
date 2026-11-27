@@ -5,13 +5,19 @@ import { planLabels, formatPlan, loadConfig } from './labels.mjs';
 
 const config = loadConfig();
 
-test('Konfiguration enthält die neun Labels der Spec', () => {
-  assert.equal(config.labels.length, 9);
+test('Konfiguration enthält die zehn Labels', () => {
+  assert.equal(config.labels.length, 10);
 });
 
-test('leeres Repo: alle neun anlegen, nichts ändern oder entfernen', () => {
+test('Phasen-Labels der Spec sortieren absteigend in Phasenfolge (Stand oben)', () => {
+  const phasen = ['ready-to-grill', 'ready-to-slice', 'sliced'];
+  for (const name of phasen) assert.ok(config.labels.some((l) => l.name === name), name);
+  assert.deepEqual([...phasen].sort().reverse(), ['sliced', 'ready-to-slice', 'ready-to-grill']);
+});
+
+test('leeres Repo: alle zehn anlegen, nichts ändern oder entfernen', () => {
   const plan = planLabels([], config);
-  assert.equal(plan.create.length, 9);
+  assert.equal(plan.create.length, 10);
   assert.deepEqual(plan.update, []);
   assert.deepEqual(plan.remove, []);
 });

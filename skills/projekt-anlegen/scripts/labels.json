@@ -7,6 +7,7 @@
     { "name": "wontfix", "color": "ffffff", "description": "Wird nicht umgesetzt" },
     { "name": "ready-to-grill", "color": "f9a8d4", "description": "Spec-Idee, noch per /spec zu grillen" },
     { "name": "ready-to-slice", "color": "db2777", "description": "Spec in docs/specs/, bereit zum Slicen per /spec" },
+    { "name": "sliced", "color": "9d174d", "description": "Spec geschnitten, Tickets laufen (Stand oder Abnahme per /spec)" },
     { "name": "bug", "color": "d73a4a", "description": "Etwas funktioniert nicht" },
     { "name": "enhancement", "color": "a2eeef", "description": "Neue Funktion oder Verbesserung" }
   ],
