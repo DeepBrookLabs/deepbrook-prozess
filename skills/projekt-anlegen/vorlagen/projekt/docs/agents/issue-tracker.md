@@ -1,5 +1,7 @@
 # Issue tracker: GitHub
 
+> Based on mattpocock/skills (https://github.com/mattpocock/skills), MIT License, Copyright (c) 2026 Matt Pocock.
+
 Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
 ## Conventions

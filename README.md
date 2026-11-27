@@ -91,3 +91,12 @@ Prüf danach mit `git status`, was sich geändert hat, und committe es. Ein Upda
 | `GLOSSARY.md` | Begriffe des Prozesses |
 
 Dazu installiert das Setup ausgewählte Skills von [mattpocock/skills](https://github.com/mattpocock/skills), zum Beispiel `grilling`, `tdd`, `pr` und `code-review` (Liste in `skills/projekt-anlegen/scripts/skills.json`).
+
+## Lizenz
+
+[MIT](LICENSE), Copyright (c) 2026 Markus Schwinn.
+
+Einige Teile stammen aus [mattpocock/skills](https://github.com/mattpocock/skills) (MIT, Copyright (c) 2026 Matt Pocock) und tragen dessen Hinweis:
+
+- `skills/to-tickets/` (angepasst; Lizenztext in [`skills/to-tickets/LICENSE`](skills/to-tickets/LICENSE))
+- die Vorlagen `docs/agents/issue-tracker.md` und `docs/agents/triage-labels.md` unter `skills/projekt-anlegen/vorlagen/projekt/`
