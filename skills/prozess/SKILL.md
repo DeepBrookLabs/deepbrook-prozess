@@ -30,7 +30,7 @@ Labels und Board-Status sind in GitHub getrennt; halte sie selbst synchron. Setz
 
 - `ready-for-agent`: vollständig beschrieben, Claude darf ohne den Nutzer umsetzen.
 - `ready-for-human`: braucht den Nutzer (Grafik, Entscheidung, Gerätetest, Zugang).
-- Phasen eines Spec-Issues: `ready-to-grill` (Spec-Idee), `ready-to-slice` (Spec liegt in `docs/specs/`), danach keins mehr; den Fortschritt zeigen die Sub-Issues. Den Ablauf führen `/spec-idee` und `/spec`.
+- Phasen eines Spec-Issues: `ready-to-grill` (Spec-Idee), `ready-to-slice` (Spec liegt in `docs/specs/`), `sliced` (Tickets angelegt, Phase Stand bis Abnahme); den Fortschritt zeigen die Sub-Issues. Den Ablauf führen `/spec-idee` und `/spec`. Eine Board-Ansicht, nach Labels absteigend sortiert, ordnet die Spalte Specs in Phasenfolge (`sliced` oben).
 - Die übrigen Labels (`needs-triage`, `needs-info`, `wontfix`) übersetzt `docs/agents/triage-labels.md`.
 
 ## Ticket umsetzen

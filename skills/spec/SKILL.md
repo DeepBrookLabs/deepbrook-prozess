@@ -17,9 +17,11 @@ Mit `#<nr>` lies Labels, Sub-Issues (`subIssuesSummary`) und Status des Issues u
 |---|---|
 | Label `ready-to-grill` | Grillen |
 | Label `ready-to-slice` | Slicen |
-| kein Phasen-Label, offene Sub-Issues | Stand |
-| kein Phasen-Label, alle Sub-Issues zu | Abnahme |
+| Label `sliced`, offene Sub-Issues | Stand |
+| Label `sliced`, alle Sub-Issues zu | Abnahme |
 | Issue geschlossen | nur melden: Spec erledigt |
+
+Trägt ein offenes Spec-Issue mit Sub-Issues kein Phasen-Label (angelegt vor Einführung von `sliced`), setz `sliced` und bestimme die Phase dann.
 
 Nenn dem Nutzer die Phase in einem Satz, dann führe sie aus.
 
@@ -38,9 +40,9 @@ Fertig, wenn der PR offen ist, auf dem Board in Review liegt und das Issue `read
 1. Prüf, dass die Spec auf `main` liegt; sonst zuerst den PR mergen lassen.
 2. Ruf den Skill `to-tickets` mit dem Spec-Pfad auf. Die Tickets werden Sub-Issues dieses Issues. Schneide so, dass Logik, die sich ohne Oberfläche testen lässt, ein eigenes Ticket vor ihrer Darstellung bekommt; die Darstellung hängt dann als Blocker daran. Zeig dem Nutzer den Zuschnitt mit dem Label je Ticket (`ready-for-agent` oder `ready-for-human`), bevor du die Tickets anlegst.
 3. Leg jedes Ticket aufs Board und setz Status und Bereich nach dem Skill `prozess` und den Bereichen in `docs/agents/prozess.md`.
-4. Entferne das Label `ready-to-slice`.
+4. Ersetze das Label `ready-to-slice` durch `sliced`.
 
-Fertig, wenn jedes Sub-Issue auf dem Board Status und Bereich hat und das Issue kein Phasen-Label mehr trägt. Nenn das erste Ticket in Bereit.
+Fertig, wenn jedes Sub-Issue auf dem Board Status und Bereich hat und das Issue `sliced` trägt. Nenn das erste Ticket in Bereit.
 
 ## Stand
 
@@ -53,6 +55,6 @@ Fertig, wenn jedes Sub-Issue auf dem Board Status und Bereich hat und das Issue 
 1. Geh jedes AK der Spec durch und ordne ihm einen Beleg zu: einen grünen Test (Name, Lauf) oder eine Abnahme durch den Nutzer.
 2. Prüf die AK, die der Nutzer bestätigen muss (Optik, Geräte, externe Dienste), einzeln mit ihm. Fällt eins durch, leg ein Ticket als Sub-Issue an; die Spec bleibt dann in Phase Stand.
 3. Stand-Zeile der Spec auf „Status: umgesetzt“ mit Tickets und Abnahmedatum, Status in `docs/specs/README.md`, PR mit dem Skill `pr`, als Spec-PR aufs Board (Skill `prozess`).
-4. Schließ das Issue mit einem Kommentar und setz die Karte auf Erledigt.
+4. Schließ das Issue mit einem Kommentar und setz die Karte auf Erledigt. `sliced` bleibt stehen.
 
 Fertig, wenn jedes AK einen Beleg hat und die Karte in Erledigt liegt.

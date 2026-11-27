@@ -26,9 +26,11 @@ flowchart LR
 1. **`/spec-idee`**: Du erzählst eine Idee. Claude legt dafür ein Spec-Issue an (Label `ready-to-grill`) und stellt es in die Spalte Specs.
 2. **`/spec #<nr>`**: Claude erkennt am Label, wo die Spec steht, und macht den nächsten Schritt:
    - **Grillen:** Claude stellt dir Fragen, bis die Idee klar ist, und schreibt die Spec nach `docs/specs/` (Label `ready-to-slice`). Du mergst den Pull Request mit der Spec.
-   - **Slicen:** Claude zerlegt die Spec in Tickets und hängt sie als Unter-Issues an das Spec-Issue. Tickets mit `ready-for-agent` darf Claude allein umsetzen, Tickets mit `ready-for-human` brauchen dich (Grafik, Entscheidung, Test am Gerät).
+   - **Slicen:** Claude zerlegt die Spec in Tickets und hängt sie als Unter-Issues an das Spec-Issue (Label `sliced`). Tickets mit `ready-for-agent` darf Claude allein umsetzen, Tickets mit `ready-for-human` brauchen dich (Grafik, Entscheidung, Test am Gerät).
 3. **Ticket umsetzen**: Sag zum Beispiel „Weiter mit #12“. Claude legt einen Branch an, baut testgetrieben (Skill `tdd`) und öffnet einen Pull Request. Du schaust ihn an und mergst ihn.
 4. **Abnahme**: Sind alle Tickets erledigt, rufst du noch einmal `/spec #<nr>` auf. Claude prüft mit dir die Abnahmekriterien; danach ist die Spec erledigt.
+
+**Tipp fürs Board:** Sortier die Ansicht nach Labels absteigend (▾ neben dem Ansichtsnamen → Sort by → Labels). Dann steht in der Spalte Specs oben, was schon Tickets hat (`sliced`), darunter `ready-to-slice` und `ready-to-grill`. Blende außerdem das Feld „Sub-issues progress“ ein (▾ → Fields): Es zeigt je Spec, wie viele Tickets erledigt sind; ist es voll, ist die Spec reif für die Abnahme.
 
 Konzeptbilder, Notizen oder PDFs legst du jederzeit in den Ordner `inbox/`. Claude schaut dort nach und übernimmt passende Dateien in Spec oder Ticket.
 
