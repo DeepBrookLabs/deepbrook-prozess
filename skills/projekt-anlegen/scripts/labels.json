@@ -1,0 +1,22 @@
+{
+  "labels": [
+    { "name": "ready-for-agent", "color": "0e8a16", "description": "Vollständig beschrieben, Claude darf ohne den Nutzer umsetzen" },
+    { "name": "ready-for-human", "color": "1d76db", "description": "Braucht den Nutzer (Grafik, Entscheidung, Gerätetest, Zugang)" },
+    { "name": "needs-triage", "color": "d4c5f9", "description": "Muss noch eingeschätzt werden" },
+    { "name": "needs-info", "color": "fbca04", "description": "Wartet auf Informationen" },
+    { "name": "wontfix", "color": "ffffff", "description": "Wird nicht umgesetzt" },
+    { "name": "ready-to-grill", "color": "f9a8d4", "description": "Spec-Idee, noch per /spec zu grillen" },
+    { "name": "ready-to-slice", "color": "db2777", "description": "Spec in docs/specs/, bereit zum Slicen per /spec" },
+    { "name": "bug", "color": "d73a4a", "description": "Etwas funktioniert nicht" },
+    { "name": "enhancement", "color": "a2eeef", "description": "Neue Funktion oder Verbesserung" }
+  ],
+  "removableDefaults": [
+    "documentation",
+    "duplicate",
+    "good first issue",
+    "help wanted",
+    "invalid",
+    "question",
+    "accessibility"
+  ]
+}
