@@ -18,11 +18,13 @@ Labels und Board-Status sind in GitHub getrennt; halte sie selbst synchron. Setz
 | Label `ready-for-agent` oder `ready-for-human` **und** kein offener Blocker | Bereit |
 | Arbeit beginnt (Branch angelegt), der erste Schreibschritt der Sitzung | In Arbeit |
 | PR geöffnet | Review |
+| Spec-PR (Spec-Datei aus `/spec`) geöffnet, eigene Karte mit Bereich Spec | Review |
 | PR gemergt oder Issue geschlossen | Erledigt |
 
 - **Neue Issues** legst du selbst aufs Board und setzt sofort Status und Bereich; eine Auto-Add-Automatik gibt es nicht. Der Bereich ist der Schwerpunkt des Tickets; ein vertikaler Schnitt über mehrere Schichten bekommt die Schicht mit der meisten Arbeit.
 - **Nach dem Schließen** prüfen: Das Issue liegt in Erledigt (die Automatiken „Item closed“ und „Pull request merged“ setzen es meist; sonst selbst), und jedes Ticket, das es blockiert hat, rückt nach Bereit, wenn es keinen offenen Blocker mehr hat und ein `ready-for-*`-Label trägt.
 - Eine Karte nach Erledigt zu ziehen schließt das Issue nicht.
+- **Spec-PRs** gehören zu keinem Ticket. Leg den PR selbst aufs Board (`gh project item-add <board> --owner <owner> --url <pr-url>`), Bereich Spec, Spalte Review, damit der Nutzer sieht, dass er auf seinen Merge wartet; nach dem Merge setzt die Automatik ihn auf Erledigt. Im Text steht `Refs #<nr>` statt `Closes`, sonst schließt der Merge das Spec-Issue.
 
 ## Labels
 

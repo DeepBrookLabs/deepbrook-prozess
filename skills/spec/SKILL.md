@@ -28,10 +28,10 @@ Nenn dem Nutzer die Phase in einem Satz, dann führe sie aus.
 1. Lies das Issue, seine Unterlagen (Konzeptbilder, Dokumente, Links, passende Dateien in `inbox/`), verwandte Specs, `docs/DESIGN.md`, das Glossar und die ADRs im Bereich (wo sie liegen, sagt `docs/agents/domain.md`).
 2. Ruf die Skills `grilling` und `domain-modeling` auf und grille die Idee. Fertig, wenn jeder Zweig des Entscheidungsbaums vom Nutzer entschieden ist.
 3. Schreib `docs/specs/<name>.md` nach `docs/specs/_vorlage.md` (Stand-Zeile mit „Status: Entwurf“, Bezug, Unterlagen, Problemstellung, Lösung, User Stories, Entscheidungen, Abnahmekriterien mit Testnähten, Testentscheidungen, Außerhalb des Umfangs). Trag sie in `docs/specs/README.md` ein.
-4. Branch, Commit mit Spec und Unterlagen, PR mit dem Skill `pr`. Unterlagen außerhalb des Repos holst du dabei herein: nach `docs/specs/<name>/`, sofern das Projekt keinen anderen Ort festlegt; Dateien aus `inbox/` verschiebst du dorthin.
+4. Branch, Commit mit Spec und Unterlagen, PR mit dem Skill `pr`, als Spec-PR aufs Board (Skill `prozess`). Unterlagen außerhalb des Repos holst du dabei herein: nach `docs/specs/<name>/`, sofern das Projekt keinen anderen Ort festlegt; Dateien aus `inbox/` verschiebst du dorthin.
 5. Issue-Text nach der Spec-Vorlage in `.github/ISSUE_TEMPLATE/` (Spec-Link, Zusammenfassung, „abgeschlossen, wenn alle AK erfüllt sind“), Label `ready-to-grill` → `ready-to-slice`.
 
-Fertig, wenn der PR offen ist und das Issue `ready-to-slice` trägt. Nächster Schritt für den Nutzer: PR mergen, dann `/spec #<nr>`.
+Fertig, wenn der PR offen ist, auf dem Board in Review liegt und das Issue `ready-to-slice` trägt. Nächster Schritt für den Nutzer: PR mergen, dann `/spec #<nr>`.
 
 ## Slicen
 
@@ -52,7 +52,7 @@ Fertig, wenn jedes Sub-Issue auf dem Board Status und Bereich hat und das Issue 
 
 1. Geh jedes AK der Spec durch und ordne ihm einen Beleg zu: einen grünen Test (Name, Lauf) oder eine Abnahme durch den Nutzer.
 2. Prüf die AK, die der Nutzer bestätigen muss (Optik, Geräte, externe Dienste), einzeln mit ihm. Fällt eins durch, leg ein Ticket als Sub-Issue an; die Spec bleibt dann in Phase Stand.
-3. Stand-Zeile der Spec auf „Status: umgesetzt“ mit Tickets und Abnahmedatum, Status in `docs/specs/README.md`, PR mit dem Skill `pr`.
+3. Stand-Zeile der Spec auf „Status: umgesetzt“ mit Tickets und Abnahmedatum, Status in `docs/specs/README.md`, PR mit dem Skill `pr`, als Spec-PR aufs Board (Skill `prozess`).
 4. Schließ das Issue mit einem Kommentar und setz die Karte auf Erledigt.
 
 Fertig, wenn jedes AK einen Beleg hat und die Karte in Erledigt liegt.
