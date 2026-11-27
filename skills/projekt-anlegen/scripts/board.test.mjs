@@ -9,6 +9,7 @@ import {
   statusOptionsFor,
   bereichOptionsFor,
   plainName,
+  checkExisting,
   renderProjektwerte,
   replaceProjektwerte,
 } from './board.mjs';
@@ -120,4 +121,16 @@ test('Projektwerte ersetzen den alten Abschnitt und lassen den Rest stehen', () 
 test('Projektwerte werden angehängt, wenn der Abschnitt fehlt', () => {
   assert.equal(replaceProjektwerte('# Issue tracker\n\nText\n', '## Projektwerte\n\n- neu\n'), '# Issue tracker\n\nText\n\n## Projektwerte\n\n- neu\n');
   assert.equal(replaceProjektwerte('', '## Projektwerte\n'), '# Issue tracker: GitHub\n\n## Projektwerte\n');
+});
+
+test('Vorhandenes Board mit gleichem Titel stoppt immer', () => {
+  const msg = checkExisting({ owner: 'o', title: 'r', sameTitle: { url: 'u1' }, linked: [], neu: true });
+  assert.match(msg, /schon ein Board „r“: u1/);
+});
+
+test('Mit dem Repo verknüpftes Board stoppt, bis der Nutzer ein neues will', () => {
+  const linked = [{ title: 'Alt', url: 'u2' }];
+  assert.match(checkExisting({ owner: 'o', title: 'r', linked, neu: false }), /verknüpft.*Alt \(u2\).*--neues-board/s);
+  assert.equal(checkExisting({ owner: 'o', title: 'r', linked, neu: true }), null);
+  assert.equal(checkExisting({ owner: 'o', title: 'r', linked: [], neu: false }), null);
 });
