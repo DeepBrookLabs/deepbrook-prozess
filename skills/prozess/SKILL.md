@@ -35,7 +35,7 @@ Labels und Board-Status sind in GitHub getrennt; halte sie selbst synchron. Setz
 
 1. Branch anlegen, Karte auf In Arbeit.
 2. Umsetzen, wo möglich testgetrieben (Skill `tdd`).
-3. PR öffnen, den Text **immer** mit dem Skill `pr` schreiben, `Closes #<nr>` darin; Karte auf Review.
+3. PR öffnen, den Text **immer** mit dem Skill `pr` schreiben, `Closes #<nr>` darin; Karte auf Review. Nur das Schlüsselwort (`Closes`, `Fixes`, `Resolves`) verknüpft PR und Issue; ohne diese Verknüpfung fehlt das PR-Icon auf der Karte. Schließt der PR das Ticket nur teilweise, schreib `Teil von #<nr>` und bitte den Nutzer, beide in der Seitenleiste des PRs unter „Development“ zu verknüpfen (per API geht das nicht).
 4. Vor jedem weiteren Push auf den Branch `gh pr view <nr> --json state` prüfen. Ist der PR schon gemergt, biete einen Folge-PR vom selben Branch an. Mergen nur, wenn der Nutzer genau diesen PR freigibt.
 5. Nach dem Merge: Nachlauf wie unter „Nach dem Schließen“, dann dem Nutzer `/clear` vorschlagen und das nächste startbare Ticket nennen.
 
